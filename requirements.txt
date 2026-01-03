@@ -1,2 +1,4 @@
 aiogram==3.23.0
 emoji==2.15.0
+psycopg2==2.9.11
+SQLAlchemy==2.0.45
