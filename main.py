@@ -10,6 +10,7 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from queries import add_user
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = getenv('TOKEN')
@@ -27,6 +28,7 @@ dp = Dispatcher()
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     users_table.append({'chat_id': message.from_user.id})
+    add_user(message.from_user.id)
     """
     This handler receives messages with `/start` command
     """
