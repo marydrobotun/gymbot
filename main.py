@@ -2,7 +2,7 @@ import asyncio
 import logging
 import sys
 from os import getenv
-
+from sqlalchemy.exc import IntegrityError
 import emoji
 from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
@@ -10,7 +10,7 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from queries import add_user
+from queries import add_user, print_user_id, add_training
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = getenv('TOKEN')
@@ -28,7 +28,12 @@ dp = Dispatcher()
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     users_table.append({'chat_id': message.from_user.id})
-    add_user(message.from_user.id)
+    try:
+        add_user(message.from_user.id)
+    except IntegrityError:
+        print('user already exists')
+
+#    print_user_id(message.from_user.id)
     """
     This handler receives messages with `/start` command
     """
@@ -79,6 +84,7 @@ async def text_handler(message: Message) -> None:
     By default, message handler will handle all message types (like a text, photo, sticker etc.)
     """
     if message.from_user.id in TRAINING_NAME_AWAIT:
+        add_training(chat_id=message.from_user.id, title=message.text)
         trainings_table.append({'chat_id': message.from_user.id, 'title': message.text})
         training_id = trainings_table.index({'chat_id': message.from_user.id, 'title': message.text})
         TRAINING_NAME_AWAIT.remove(message.from_user.id)
